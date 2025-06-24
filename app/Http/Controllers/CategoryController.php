@@ -98,7 +98,7 @@ class CategoryController extends Controller
         return response()->json($category);
     }
 
-    public function destroy($id)
+    public function destroy(Request $request,$id)
     {
         if (! $request->user()) {
             return response()->json([
@@ -109,7 +109,7 @@ class CategoryController extends Controller
     
         if ($request->user()->role !== 'admin') {
             return response()->json([
-                'message' => 'Acceso denegado. Solo los administradores pueden crear categorías.'
+                'message' => 'Acceso denegado. Solo los administradores pueden eliminar categorías.'
             ], 403);
         }
 

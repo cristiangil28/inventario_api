@@ -25,6 +25,19 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
+         if (! $request->user()) {
+            return response()->json([
+                'message' => 'Token no válido o sesión expirada. Por favor, inicie sesión.'
+            ], 401);
+        }
+
+    
+        if ($request->user()->role !== 'admin') {
+            return response()->json([
+                'message' => 'Acceso denegado. Solo los administradores pueden eliminar categorías.'
+            ], 403);
+        }
+
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -43,6 +56,19 @@ class ProductController extends Controller
 
     public function update(Request $request, $id)
     {
+         if (! $request->user()) {
+            return response()->json([
+                'message' => 'Token no válido o sesión expirada. Por favor, inicie sesión.'
+            ], 401);
+        }
+
+    
+        if ($request->user()->role !== 'admin') {
+            return response()->json([
+                'message' => 'Acceso denegado. Solo los administradores pueden actualizar categorías.'
+            ], 403);
+        }
+
         $product = Product::find($id);
         if (! $product) {
             return response()->json(['message' => 'Producto no encontrado'], 404);
@@ -64,8 +90,21 @@ class ProductController extends Controller
         return response()->json($product);
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
+         if (! $request->user()) {
+            return response()->json([
+                'message' => 'Token no válido o sesión expirada. Por favor, inicie sesión.'
+            ], 401);
+        }
+
+    
+        if ($request->user()->role !== 'admin') {
+            return response()->json([
+                'message' => 'Acceso denegado. Solo los administradores pueden eliminar categorías.'
+            ], 403);
+        }
+
         $product = Product::find($id);
         if (! $product) {
             return response()->json(['message' => 'Producto no encontrado'], 404);
