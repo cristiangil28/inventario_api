@@ -7,7 +7,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\AuthController;
 use App\Http\Middleware\SecureAccess;
 
-Route::post('/register', [AuthController::class, 'register']);
+Route::post('/register', [AuthController::class, 'register'])->middleware('auth:sanctum');
 Route::post('/login', [AuthController::class, 'login'])->withoutMiddleware('access');
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
