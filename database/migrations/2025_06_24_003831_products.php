@@ -18,8 +18,6 @@ return new class extends Migration
             $table->decimal('price', 10, 2);
             $table->unsignedInteger('stock')->default(0);
             $table->timestamps();
-
-            // Índice para búsquedas por categoría
             $table->index('category_id');
         });
     }
