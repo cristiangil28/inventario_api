@@ -7,9 +7,14 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\AuthController;
 use App\Http\Middleware\SecureAccess;
 
-Route::post('/register', [AuthController::class, 'register'])->middleware('auth:sanctum');
+
 Route::post('/login', [AuthController::class, 'login'])->withoutMiddleware('access');
-Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+
+
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+});
 
 Route::middleware(['access'])->group(function () {
 
@@ -27,11 +32,11 @@ Route::middleware(['access'])->group(function () {
     Route::put('/product/{id}', [ProductController::class, 'update']);
     Route::delete('/product/{id}', [ProductController::class, 'destroy']);
     
+    Route::get('/categories', [CategoryController::class, 'index']);
+    Route::get('/category/{id}', [CategoryController::class, 'show']);
+
+    Route::get('/products', [ProductController::class, 'index']);
+    Route::get('/product/{id}', [ProductController::class, 'show']);
 });
 
 
-Route::get('/categories', [CategoryController::class, 'index'])->middleware('access');
-Route::get('/category/{id}', [CategoryController::class, 'show']);
-
-Route::get('/products', [ProductController::class, 'index']);
-Route::get('/product/{id}', [ProductController::class, 'show']);
