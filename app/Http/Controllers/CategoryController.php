@@ -24,6 +24,28 @@ class CategoryController extends Controller
 
     public function store(Request $request)
     {
+        return response()->json([
+            'message' => 'Método no permitido. Use POST para crear una categoría.'
+        ], 405);
+        if (! $request->hasHeader('Authorization')) {
+            return response()->json([
+                'message' => 'No se proporcionó un token de autenticación.'
+            ], 401);
+        }
+
+        if (! $request->user()) {
+            return response()->json([
+                'message' => 'Token no válido o sesión expirada. Por favor, inicie sesión.'
+            ], 401);
+        }
+
+    
+        if ($request->user()->role !== 'admin') {
+            return response()->json([
+                'message' => 'Acceso denegado. Solo los administradores pueden crear categorías.'
+            ], 403);
+        }
+
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255|unique:categories,name',
             'description' => 'nullable|string'
@@ -39,6 +61,25 @@ class CategoryController extends Controller
 
     public function update(Request $request, $id)
     {
+        if (! $request->hasHeader('Authorization')) {
+            return response()->json([
+                'message' => 'No se proporcionó un token de autenticación.'
+            ], 401);
+        }
+
+        if (! $request->user()) {
+            return response()->json([
+                'message' => 'Token no válido o sesión expirada. Por favor, inicie sesión.'
+            ], 401);
+        }
+
+    
+        if ($request->user()->role !== 'admin') {
+            return response()->json([
+                'message' => 'Acceso denegado. Solo los administradores pueden crear categorías.'
+            ], 403);
+        }
+
         $category = Category::find($id);
         if (! $category) {
             return response()->json(['message' => 'Categoría no encontrada'], 404);
@@ -59,6 +100,19 @@ class CategoryController extends Controller
 
     public function destroy($id)
     {
+        if (! $request->user()) {
+            return response()->json([
+                'message' => 'Token no válido o sesión expirada. Por favor, inicie sesión.'
+            ], 401);
+        }
+
+    
+        if ($request->user()->role !== 'admin') {
+            return response()->json([
+                'message' => 'Acceso denegado. Solo los administradores pueden crear categorías.'
+            ], 403);
+        }
+
         $category = Category::find($id);
         if (! $category) {
             return response()->json(['message' => 'Categoría no encontrada'], 404);
