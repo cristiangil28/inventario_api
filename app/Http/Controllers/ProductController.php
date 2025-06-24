@@ -34,7 +34,7 @@ class ProductController extends Controller
     
         if ($request->user()->role !== 'admin') {
             return response()->json([
-                'message' => 'Acceso denegado. Solo los administradores pueden eliminar categorías.'
+                'message' => 'Acceso denegado. Solo los administradores pueden crear Productos.'
             ], 403);
         }
 
@@ -65,7 +65,7 @@ class ProductController extends Controller
     
         if ($request->user()->role !== 'admin') {
             return response()->json([
-                'message' => 'Acceso denegado. Solo los administradores pueden actualizar categorías.'
+                'message' => 'Acceso denegado. Solo los administradores pueden actualizar Productos.'
             ], 403);
         }
 
@@ -101,7 +101,7 @@ class ProductController extends Controller
     
         if ($request->user()->role !== 'admin') {
             return response()->json([
-                'message' => 'Acceso denegado. Solo los administradores pueden eliminar categorías.'
+                'message' => 'Acceso denegado. Solo los administradores pueden eliminar Productos.'
             ], 403);
         }
 

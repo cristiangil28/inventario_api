@@ -24,9 +24,6 @@ class CategoryController extends Controller
 
     public function store(Request $request)
     {
-        return response()->json([
-            'message' => 'Método no permitido. Use POST para crear una categoría.'
-        ], 405);
         if (! $request->hasHeader('Authorization')) {
             return response()->json([
                 'message' => 'No se proporcionó un token de autenticación.'
@@ -76,7 +73,7 @@ class CategoryController extends Controller
     
         if ($request->user()->role !== 'admin') {
             return response()->json([
-                'message' => 'Acceso denegado. Solo los administradores pueden crear categorías.'
+                'message' => 'Acceso denegado. Solo los administradores pueden actualizar categorías.'
             ], 403);
         }
 
