@@ -5,44 +5,37 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Repositories\CategoryRepositoryInterface;
 
 class CategoryController extends Controller
 {
+    protected $categories;
+
+    public function __construct(CategoryRepositoryInterface $categories)
+    {
+        $this->categories = $categories;
+    }
+    
     public function index()
     {
-        return response()->json(Category::all());
+        return $this->categories->all();
     }
 
     public function show($id)
     {
-        $category = Category::with('products')->find($id);
-        if (! $category) {
-            return response()->json(['message' => 'Categoría no encontrada'], 404);
-        }
-        return response()->json($category);
+        $category = $this->categories->find($id);
+        return $category
+            ? response()->json($category)
+            : response()->json(['message' => 'Categoría no encontrada'], 404);
     }
 
     public function store(Request $request)
     {
-        if (! $request->hasHeader('Authorization')) {
-            return response()->json([
-                'message' => 'No se proporcionó un token de autenticación.'
-            ], 401);
-        }
-
-        if (! $request->user()) {
-            return response()->json([
-                'message' => 'Token no válido o sesión expirada. Por favor, inicie sesión.'
-            ], 401);
-        }
-
-    
         if ($request->user()->role !== 'admin') {
             return response()->json([
-                'message' => 'Acceso denegado. Solo los administradores pueden crear categorías.'
+                'message' => 'Acceso denegado. Solo los administradores pueden actualizar categorías.'
             ], 403);
         }
-
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255|unique:categories,name',
             'description' => 'nullable|string'
@@ -52,32 +45,21 @@ class CategoryController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $category = Category::create($validator->validated());
+        $category = $this->categories->create($validator->validated());
+
         return response()->json($category, 201);
     }
 
+
     public function update(Request $request, $id)
     {
-        if (! $request->hasHeader('Authorization')) {
-            return response()->json([
-                'message' => 'No se proporcionó un token de autenticación.'
-            ], 401);
-        }
-
-        if (! $request->user()) {
-            return response()->json([
-                'message' => 'Token no válido o sesión expirada. Por favor, inicie sesión.'
-            ], 401);
-        }
-
-    
         if ($request->user()->role !== 'admin') {
             return response()->json([
                 'message' => 'Acceso denegado. Solo los administradores pueden actualizar categorías.'
             ], 403);
         }
 
-        $category = Category::find($id);
+        $category = $this->categories->find($id);
         if (! $category) {
             return response()->json(['message' => 'Categoría no encontrada'], 404);
         }
@@ -91,31 +73,24 @@ class CategoryController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $category->update($validator->validated());
+        $category= $this->categories->update($category->id,$validator->validated());
         return response()->json($category);
     }
 
     public function destroy(Request $request,$id)
     {
-        if (! $request->user()) {
-            return response()->json([
-                'message' => 'Token no válido o sesión expirada. Por favor, inicie sesión.'
-            ], 401);
-        }
-
-    
         if ($request->user()->role !== 'admin') {
             return response()->json([
                 'message' => 'Acceso denegado. Solo los administradores pueden eliminar categorías.'
             ], 403);
         }
 
-        $category = Category::find($id);
+        $category = $this->categories->find($id);
         if (! $category) {
             return response()->json(['message' => 'Categoría no encontrada'], 404);
         }
 
-        $category->delete();
+        $this->categories->delete($category->id);
         return response()->json(['message' => 'Categoría eliminada']);
     }
 }
