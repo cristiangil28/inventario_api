@@ -17,13 +17,20 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
+        if (User::where('email', $request->email)->exists()) {
+            return response()->json(['message' => 'El Email ya se encuentra registrado.'], 409);
+        }
+
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6',
             'role' => 'in:admin,user'
+        ], [
+            'email.unique' => 'El correo electrónico ya está registrado.'
         ]);
 
+        
         $data = $request->only(['name', 'email', 'password']);
         $data['password'] = Hash::make($request->password);
 

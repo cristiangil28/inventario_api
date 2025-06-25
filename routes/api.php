@@ -14,12 +14,11 @@ Route::post('/login', [AuthController::class, 'login'])->withoutMiddleware('acce
 
 
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::post('/register', [AuthController::class, 'register']);
     Route::post('/logout', [AuthController::class, 'logout']);
 });
 
 Route::middleware(['access'])->group(function () {
-
+    Route::post('/register', [AuthController::class, 'register']);
     Route::get('/users', [UserController::class, 'index']);
     Route::get('/user/{id}', [UserController::class, 'show']);
     Route::post('/user', [UserController::class, 'store']);
