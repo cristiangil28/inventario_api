@@ -7,6 +7,8 @@ use App\Repositories\CategoryRepositoryInterface;
 use App\Repositories\CategoryRepository;
 use App\Repositories\ProductRepositoryInterface;
 use App\Repositories\ProductRepository;
+use App\Services\ProductServiceInterface;
+use App\Services\ProductService;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -20,6 +22,8 @@ class RepositoryServiceProvider extends ServiceProvider
 
         
         $this->app->bind(ProductRepositoryInterface::class, ProductRepository::class);
+
+        $this->app->bind(ProductServiceInterface::class, ProductService::class);
     }
 
     /**

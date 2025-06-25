@@ -7,6 +7,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\AuthController;
 use App\Http\Middleware\SecureAccess;
 use App\Repositories\ProductRepositoryInterface;
+use App\Services\ProductServiceInterface;
 
 
 Route::post('/login', [AuthController::class, 'login'])->withoutMiddleware('access');
@@ -40,7 +41,7 @@ Route::middleware(['access'])->group(function () {
     Route::get('/product/{id}', [ProductController::class, 'show']);
 });
 
-Route::get('/test-bind', function (ProductRepositoryInterface $repo) {
+Route::get('/test-bind', function (ProductServiceInterface $repo) {
     return $repo->allWithCategory();
 });
 

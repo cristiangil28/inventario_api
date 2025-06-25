@@ -6,26 +6,25 @@ use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use App\Repositories\ProductRepositoryInterface;
+use App\Services\ProductServiceInterface;
 
 class ProductController extends Controller
 {
-    protected $products;
+    protected $service;
 
-    public function __construct(ProductRepositoryInterface $repo)
+    public function __construct(ProductServiceInterface $service)
     {
-        // Aquí podrías inyectar un repositorio si lo necesitas
-         $this->products = $repo;
+         $this->service = $service;
     }
     
     public function index()
     {
-        return $this->products->allWithCategory();
+        return $this->service->getAllWithCategory();
     }
 
     public function show($id)
     {
-        $product = $this->products->find($id);
+        $product = $this->service->find($id);
         return $product
             ? response()->json($product)
             : response()->json(['message' => 'Producto no encontrado'], 404);
@@ -51,7 +50,7 @@ class ProductController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $product = $this->products->create($validator->validated());
+        $product = $this->service->create($validator->validated());
         return response()->json($product, 201);
     }
 
@@ -63,7 +62,7 @@ class ProductController extends Controller
             ], 403);
         }
 
-        $product = $this->products->find($id);
+        $product = $this->service->find($id);
         if (! $product) {
             return response()->json(['message' => 'Producto no encontrado'], 404);
         }
@@ -80,7 +79,7 @@ class ProductController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $product = $this->products->update($product->id ,$validator->validated());
+        $product = $this->service->update($product->id ,$validator->validated());
         return response()->json($product);
     }
 
@@ -92,12 +91,12 @@ class ProductController extends Controller
             ], 403);
         }
 
-        $product = $this->products->find($id);
+        $product = $this->service->find($id);
         if (! $product) {
             return response()->json(['message' => 'Producto no encontrado'], 404);
         }
 
-        $this->products->delete($product->id);
+        $this->service->delete($product->id);
         return response()->json(['message' => 'Producto eliminado']);
     }
 }
