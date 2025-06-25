@@ -6,32 +6,33 @@ use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Repositories\ProductRepositoryInterface;
 
 class ProductController extends Controller
 {
+    protected $products;
+
+    public function __construct(ProductRepositoryInterface $repo)
+    {
+        // Aquí podrías inyectar un repositorio si lo necesitas
+         $this->products = $repo;
+    }
+    
     public function index()
     {
-        return response()->json(Product::with('category')->get());
+        return $this->products->allWithCategory();
     }
 
     public function show($id)
     {
-        $product = Product::with('category')->find($id);
-        if (! $product) {
-            return response()->json(['message' => 'Producto no encontrado'], 404);
-        }
-        return response()->json($product);
+        $product = $this->products->find($id);
+        return $product
+            ? response()->json($product)
+            : response()->json(['message' => 'Producto no encontrado'], 404);
     }
 
     public function store(Request $request)
     {
-         if (! $request->user()) {
-            return response()->json([
-                'message' => 'Token no válido o sesión expirada. Por favor, inicie sesión.'
-            ], 401);
-        }
-
-    
         if ($request->user()->role !== 'admin') {
             return response()->json([
                 'message' => 'Acceso denegado. Solo los administradores pueden crear Productos.'
@@ -50,26 +51,19 @@ class ProductController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $product = Product::create($validator->validated());
+        $product = $this->products->create($validator->validated());
         return response()->json($product, 201);
     }
 
     public function update(Request $request, $id)
     {
-         if (! $request->user()) {
-            return response()->json([
-                'message' => 'Token no válido o sesión expirada. Por favor, inicie sesión.'
-            ], 401);
-        }
-
-    
         if ($request->user()->role !== 'admin') {
             return response()->json([
                 'message' => 'Acceso denegado. Solo los administradores pueden actualizar Productos.'
             ], 403);
         }
 
-        $product = Product::find($id);
+        $product = $this->products->find($id);
         if (! $product) {
             return response()->json(['message' => 'Producto no encontrado'], 404);
         }
@@ -86,31 +80,24 @@ class ProductController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $product->update($validator->validated());
+        $product = $this->products->update($product->id ,$validator->validated());
         return response()->json($product);
     }
 
     public function destroy(Request $request, $id)
     {
-         if (! $request->user()) {
-            return response()->json([
-                'message' => 'Token no válido o sesión expirada. Por favor, inicie sesión.'
-            ], 401);
-        }
-
-    
         if ($request->user()->role !== 'admin') {
             return response()->json([
                 'message' => 'Acceso denegado. Solo los administradores pueden eliminar Productos.'
             ], 403);
         }
 
-        $product = Product::find($id);
+        $product = $this->products->find($id);
         if (! $product) {
             return response()->json(['message' => 'Producto no encontrado'], 404);
         }
 
-        $product->delete();
+        $this->products->delete($product->id);
         return response()->json(['message' => 'Producto eliminado']);
     }
 }
