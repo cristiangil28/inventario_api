@@ -5,25 +5,25 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use App\Repositories\CategoryRepositoryInterface;
+use App\Services\CategoryServiceInterface;
 
 class CategoryController extends Controller
 {
-    protected $categories;
+    protected $service;
 
-    public function __construct(CategoryRepositoryInterface $categories)
+    public function __construct(CategoryServiceInterface $service)
     {
-        $this->categories = $categories;
+        $this->service = $service;
     }
     
     public function index()
     {
-        return $this->categories->all();
+        return $this->service->getAll();
     }
 
     public function show($id)
     {
-        $category = $this->categories->find($id);
+        $category = $this->service->find($id);
         return $category
             ? response()->json($category)
             : response()->json(['message' => 'Categoría no encontrada'], 404);
@@ -45,7 +45,7 @@ class CategoryController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $category = $this->categories->create($validator->validated());
+        $category = $this->service->create($validator->validated());
 
         return response()->json($category, 201);
     }
@@ -59,7 +59,7 @@ class CategoryController extends Controller
             ], 403);
         }
 
-        $category = $this->categories->find($id);
+        $category = $this->service->find($id);
         if (! $category) {
             return response()->json(['message' => 'Categoría no encontrada'], 404);
         }
@@ -73,7 +73,7 @@ class CategoryController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $category= $this->categories->update($category->id,$validator->validated());
+        $category= $this->service->update($category->id,$validator->validated());
         return response()->json($category);
     }
 
@@ -85,12 +85,12 @@ class CategoryController extends Controller
             ], 403);
         }
 
-        $category = $this->categories->find($id);
+        $category = $this->service->find($id);
         if (! $category) {
             return response()->json(['message' => 'Categoría no encontrada'], 404);
         }
 
-        $this->categories->delete($category->id);
+        $this->service->delete($category->id);
         return response()->json(['message' => 'Categoría eliminada']);
     }
 }
