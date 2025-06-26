@@ -64,7 +64,7 @@ el campo de texto se adiciona el valor del token que aparece en la respuesta del
 ---
 
 ## 3. URL pública de despliegue
-
+https://inventario-api-ozyj.onrender.com
 
 ---
 
