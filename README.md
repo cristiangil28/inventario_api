@@ -1,61 +1,89 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+## Proyecto Inventario API con Laravel 12
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Este proyecto es una API RESTful construida con Laravel 12, que gestiona usuarios, categorías y productos, e incluye autenticación con Sanctum, control de acceso por roles, uso de patrones de diseño (Repository y Service) y documentación Swagger.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 1. Instrucciones para configurar localmente
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+1. Clona el repositorio:
+```bash
+git clone https://github.com/tuusuario/inventario-api.git
+cd inventario-api
+```
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+2. Instala las dependencias:
+```bash
+composer install
+```
 
-## Learning Laravel
+3. Crear la base de datos desde tu cliente MySQL:
+```sql
+CREATE DATABASE inventario;
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+4. Copia el archivo `.env.example` a `.env` y configura tu conexión a la base de datos:
+```bash
+cp .env.example .env
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+5. Genera la clave de la aplicación:
+```bash
+php artisan key:generate
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+6. Ejecuta las migraciones:
+```bash
+php artisan migrate
+```
 
-## Laravel Sponsors
+7. Inicia el servidor de desarrollo:
+```bash
+php artisan serve
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+8. (Opcional) Genera la documentación Swagger:
+```bash
+php artisan l5-swagger:generate
+```
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## 2. Cómo importar y usar la colección Postman o el archivo Swagger
 
-## Contributing
+### 📦 Colección Postman
+- Abre Postman y haz clic en **Importar**
+- Selecciona el archivo `inventario.postman_collection.json` que se encuentra en la raiz del 
+proyecto
+- todos los endpoints excepto login regquieren de 'token' el cual se genera al consumir el endpoint
+de login
+- el token se adiciona en la pestaña Authorization/ Auth Type(bearer token) y en la variable Token en 
+el campo de texto se adiciona el valor del token que aparece en la respuesta del login
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## 3. URL pública de despliegue
 
-## Security Vulnerabilities
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+---
 
-## License
+## 4. Decisiones de diseño
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 🧩 Enum vs tabla de roles
+- Se optó por usar un campo `role` de tipo `enum('admin', 'user')` para simplificar la lógica y evitar joins adicionales. Esta elección es suficiente para un sistema con 2 roles fijos.
+
+### 🛡️ Middleware de autorización
+- Se implementó un middleware `access` para proteger rutas sensibles (crear, actualizar, eliminar).
+- Además, se usa `auth:sanctum` para proteger endpoints que requieren autenticación.
+
+### 🧱 Cambios al esquema de base de datos
+- La tabla `users` incluye el campo `role` como `enum`.
+- Se implementaron relaciones `products -> category_id` y `categories` puede incluir sus productos relacionados.
+
+### 📐 Patrones de diseño
+- **Repository Pattern**: utilizado para desacoplar el acceso a datos.
+- **Service Pattern**: encapsula la lógica de negocio fuera de los controladores.
+- Justificación: facilita pruebas, mantenimiento y escalabilidad del proyecto.
+
+---
