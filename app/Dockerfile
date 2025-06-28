@@ -1,6 +1,9 @@
 # Imagen base oficial de PHP con Apache
 FROM php:8.2-apache
 
+# Ensure all packages are updated to their latest versions to reduce vulnerabilities
+RUN apt-get update && apt-get upgrade -y
+
 # Instala dependencias del sistema
 RUN apt-get update && apt-get install -y \
     git unzip zip curl libzip-dev libpng-dev libonig-dev libxml2-dev \
